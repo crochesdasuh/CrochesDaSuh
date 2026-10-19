@@ -1,7 +1,7 @@
 // Métricas anônimas do site: sem cookies, sem IP, sem dados pessoais.
 // O "sessionId" é aleatório e vive só enquanto a aba estiver aberta.
 
-export const IGNORE_METRICS_KEY = "suh:ignorar-metricas";
+import { uuid } from "@/lib/uuid";
 
 type TrackEvent =
   | { type: "page_view" }
@@ -12,7 +12,7 @@ function sessionId() {
   try {
     let id = sessionStorage.getItem("suh:sessao");
     if (!id) {
-      id = crypto.randomUUID();
+      id = uuid();
       sessionStorage.setItem("suh:sessao", id);
     }
     return id;
@@ -32,16 +32,8 @@ function referrerSource() {
   }
 }
 
-function ignored() {
-  try {
-    return localStorage.getItem(IGNORE_METRICS_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
 export function track(event: TrackEvent) {
-  if (typeof window === "undefined" || ignored()) return;
+  if (typeof window === "undefined") return;
   const payload = JSON.stringify({
     ...event,
     sessionId: sessionId(),

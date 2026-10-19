@@ -11,6 +11,11 @@ const text = (v: unknown, max: number) =>
 export async function POST(request: Request) {
   if (!isSupabaseConfigured) return new Response(null, { status: 204 });
 
+  // Quem está logado no painel (a própria Suh) não entra nas métricas. O cookie
+  // de sessão é httpOnly: só o servidor enxerga, nada fica guardado no navegador.
+  const cookies = request.headers.get("cookie") ?? "";
+  if (/(?:^|;\s*)sb-[^=]*-auth-token/.test(cookies)) return new Response(null, { status: 204 });
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();

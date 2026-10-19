@@ -1,5 +1,4 @@
 import { ShieldAlert } from "lucide-react";
-import { signOut } from "../actions";
 
 export default function NoAccessPage() {
   return (
@@ -10,7 +9,7 @@ export default function NoAccessPage() {
         <p className="mt-2 text-sm text-cafe">
           Esta conta entrou, mas não está cadastrada como administradora do ateliê.
         </p>
-        <form action={signOut} className="mt-6">
+        <form action="/admin/sair" method="post" className="mt-6">
           <button className="w-full rounded-2xl bg-terracota px-5 py-3 font-bold text-white hover:bg-terracota-escuro">
             Sair e entrar com outra conta
           </button>

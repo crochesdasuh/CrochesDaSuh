@@ -2,6 +2,13 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createSessionClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import type { PricingInput } from "@/lib/pricing";
+import {
+  youtubeId,
+  youtubeThumbnail,
+  type RecipeRow,
+  type RecipeView,
+} from "@/lib/recipes";
 import { rowToProduct, type ProductRow } from "@/lib/products";
 
 /**
@@ -55,4 +62,83 @@ export async function getMetrics(days: number) {
   const { data, error } = await supabase.rpc("admin_metrics", { days });
   if (error) throw error;
   return data as Metrics;
+}
+
+// ---------------------------------------------------------------- calculadora
+
+export type SavedCalculation = {
+  id: string;
+  name: string;
+  product_id: string | null;
+  input: PricingInput;
+  material_cost: number;
+  labor_cost: number;
+  total_hours: number;
+  price: number;
+  notes: string;
+  updated_at: string;
+};
+
+export async function getCalculations() {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("price_calculations")
+    .select("*")
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data as SavedCalculation[]).map((c) => ({
+    ...c,
+    material_cost: Number(c.material_cost),
+    labor_cost: Number(c.labor_cost),
+    total_hours: Number(c.total_hours),
+    price: Number(c.price),
+  }));
+}
+
+export async function getCalculation(id: string) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("price_calculations")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data as SavedCalculation | null;
+}
+
+// ---------------------------------------------------------------- receitas
+
+
+/**
+ * Os arquivos das receitas são privados: a página recebe só o endereço interno
+ * /admin/arquivo/<arquivo>, que confere o login a cada acesso.
+ */
+function toView(r: RecipeRow): RecipeView {
+  const fileUrl = (path: string) => `/admin/arquivo/${path}`;
+  const photoUrl = r.photo_path ? fileUrl(r.photo_path) : null;
+  const video = r.links.map((l) => youtubeId(l.url)).find(Boolean);
+  return {
+    ...r,
+    photoUrl,
+    thumbnailUrl: photoUrl ?? (video ? youtubeThumbnail(video) : null),
+    files: r.files.map((f) => ({ ...f, url: fileUrl(f.path) })),
+  };
+}
+
+export async function getRecipes() {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("recipes")
+    .select("*")
+    .order("updated_at", { ascending: false });
+  if (error) throw error;
+  return (data as RecipeRow[]).map(toView);
+}
+
+export async function getRecipe(id: string) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase.from("recipes").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return toView(data as RecipeRow);
 }

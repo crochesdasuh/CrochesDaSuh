@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { connection } from "next/server";
+import { secureCookie } from "./cookies";
 import { SUPABASE_KEY, SUPABASE_URL } from "./env";
 
 /** Cliente com a sessão do usuário (cookies). Use dentro de <Suspense> ou Server Actions. */
@@ -16,7 +17,7 @@ export async function createSessionClient() {
       getAll: () => cookieStore.getAll(),
       setAll: (toSet) => {
         try {
-          toSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
+          toSet.forEach(({ name, value, options }) => cookieStore.set(name, value, secureCookie(options)));
         } catch {
           // Server Components não podem gravar cookies; o proxy renova a sessão.
         }

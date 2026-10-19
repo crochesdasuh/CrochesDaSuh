@@ -8,8 +8,8 @@ import { ImagePlus, LoaderCircle, Save } from "lucide-react";
 import { saveProduct } from "@/app/admin/actions";
 import { categories, type Badge } from "@/data/crochets";
 import type { AdminProduct } from "@/lib/products";
-import { createBrowserSupabase } from "@/lib/supabase/browser";
-import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/env";
+import { compressImage, imageExtension } from "@/lib/image";
+import { uploadFile } from "@/lib/upload";
 
 const BADGES: Badge[] = ["Mais Pedido", "Novidade", "Feito sob Medida", "Pronta Entrega"];
 const EDITABLE_CATEGORIES = categories.filter((c) => c.id !== "todos" && c.id !== "pronta-entrega");
@@ -23,25 +23,6 @@ const QUANTITY_PRESETS = [
 const input =
   "mt-1.5 w-full rounded-xl border border-amber-100 bg-creme-claro px-4 py-2.5 text-grafite outline-none focus:border-terracota focus:ring-2 focus:ring-terracota/20";
 const labelText = "text-sm font-bold text-grafite";
-
-/** Reduz a foto (máx. 1600 px) e converte para WebP/JPEG antes de enviar. */
-async function compressImage(file: File) {
-  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-
-  const toBlob = (type: string) =>
-    new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.85));
-  let blob = await toBlob("image/webp");
-  // Safari antigo não gera WebP e devolve PNG: nesse caso usa JPEG.
-  if (!blob || blob.type !== "image/webp") blob = await toBlob("image/jpeg");
-  if (!blob) throw new Error("Não foi possível processar a imagem.");
-  return blob;
-}
 
 type Props = { product?: AdminProduct; nextSortOrder?: number };
 
@@ -74,14 +55,8 @@ function ProductFormFields({ product, nextSortOrder = 0 }: Props) {
     setUploading(true);
     try {
       const blob = await compressImage(file);
-      const ext = blob.type === "image/webp" ? "webp" : "jpg";
-      const path = `${crypto.randomUUID()}.${ext}`;
-      const supabase = createBrowserSupabase();
-      const { error } = await supabase.storage
-        .from(PRODUCT_IMAGES_BUCKET)
-        .upload(path, blob, { contentType: blob.type, cacheControl: "31536000" });
-      if (error) throw error;
-      setImageUrl(supabase.storage.from(PRODUCT_IMAGES_BUCKET).getPublicUrl(path).data.publicUrl);
+      const { publicUrl } = await uploadFile("produto-foto", blob, imageExtension(blob));
+      if (publicUrl) setImageUrl(publicUrl);
     } catch {
       setUploadError("Não foi possível enviar a foto. Tente outra imagem ou verifique a internet.");
     } finally {
