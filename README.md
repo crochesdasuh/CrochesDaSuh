@@ -46,7 +46,7 @@ Arquivos principais: `src/app/admin/`, `src/components/admin/`, `src/lib/admin.t
    insert into public.admins (user_id)
    select id from auth.users where email = 'email-da-suh@exemplo.com';
    ```
-6. Copie `.env.example` para `.env.local` e preencha com a URL e a **Publishable key**
+6. Copie `.env.example` para `.env` e preencha com a URL e a **Publishable key**
    (Project Settings → API Keys).
 
 Segurança: todas as permissões ficam no banco (Row Level Security). Visitantes só leem
