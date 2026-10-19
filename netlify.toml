@@ -1,7 +1,11 @@
-# O Netlify detecta o Next.js e aplica o adaptador oficial automaticamente.
 [build]
   command = "npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Adaptador oficial do Next.js no Netlify. Declarado aqui para não depender da
+# detecção automática: sem ele o Netlify publica a pasta .next crua e tudo dá 404.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
