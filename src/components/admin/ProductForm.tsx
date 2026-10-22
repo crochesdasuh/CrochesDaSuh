@@ -108,6 +108,18 @@ function ProductFormFields({ product, nextSortOrder = 0 }: Props) {
               onChange={(e) => handleFile(e.target.files?.[0])}
             />
           </label>
+          {imageUrl && !uploading && (
+            <button
+              type="button"
+              onClick={() => setImageUrl("")}
+              className="mt-2 text-sm font-bold text-cafe hover:text-terracota-escuro"
+            >
+              Remover foto
+            </button>
+          )}
+          {!imageUrl && (
+            <p className="mt-2 text-xs text-cafe">Sem foto, o site mostra “foto em breve” no lugar.</p>
+          )}
           {uploadError && <p className="mt-2 text-sm text-terracota-escuro">{uploadError}</p>}
           <label className="mt-4 block">
             <span className={labelText}>Descrição da foto</span>

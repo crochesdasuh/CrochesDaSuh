@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { ArrowRight, Clock, Heart, ShoppingBag, Sparkles, Truck } from "lucide-react";
 import {
   categories,
@@ -12,6 +11,7 @@ import {
 } from "@/data/crochets";
 import { track } from "@/lib/track";
 import ProductModal from "./ProductModal";
+import ProductPhoto from "./ProductPhoto";
 
 const badgeStyles: Record<Badge, string> = {
   "Mais Pedido": "bg-terracota text-white",
@@ -111,10 +111,9 @@ function ProductCard({ product, onOpen }: { product: Product; onOpen: () => void
       className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-amber-100 bg-white text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-terracota"
     >
       <div className="relative aspect-[4/3.4] overflow-hidden bg-palha">
-        <Image
+        <ProductPhoto
           src={product.image}
-          alt={product.imageAlt}
-          fill
+          alt={product.imageAlt || product.name}
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

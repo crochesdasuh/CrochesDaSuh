@@ -1,7 +1,7 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { CheckCircle2, Clock, Pencil, Plus, Truck } from "lucide-react";
+import ProductPhoto from "@/components/ProductPhoto";
 import ProductRowActions from "@/components/admin/ProductRowActions";
 import { PageHeader, Skeleton } from "@/components/admin/ui";
 import { formatPrice } from "@/data/crochets";
@@ -68,7 +68,7 @@ async function ProductList({
               }`}
             >
               <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-palha sm:size-20">
-                <Image src={p.image} alt="" fill sizes="80px" className="object-cover" />
+                <ProductPhoto src={p.image} alt={p.name} sizes="80px" compact />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">

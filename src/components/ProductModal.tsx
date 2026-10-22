@@ -1,17 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { Check, Clock, Heart, MessageCircle, Minus, Plus, ShieldCheck, Truck, X } from "lucide-react";
 import {
-  buildOrderMessage,
   colorPalettes,
   formatLeadTime,
   formatPrice,
-  whatsappLink,
   type Product,
 } from "@/data/crochets";
 import { track } from "@/lib/track";
+import ProductPhoto from "./ProductPhoto";
 
 type Props = { product: Product; onClose: () => void };
 
@@ -22,7 +20,8 @@ export default function ProductModal({ product, onClose }: Props) {
 
   const palette = colorPalettes.find((p) => p.id === paletteId) ?? colorPalettes[0];
   const ready = product.leadTime.type === "pronta";
-  const orderUrl = whatsappLink(buildOrderMessage(product, palette, quantity));
+  // O número do WhatsApp fica só no servidor: /whatsapp monta a mensagem e redireciona.
+  const orderUrl = `/whatsapp?${new URLSearchParams({ peca: product.id, cor: palette.id, qtd: String(quantity) })}`;
   const qtyIndex = product.quantity.options.indexOf(quantity);
 
   useEffect(() => {
@@ -53,12 +52,10 @@ export default function ProductModal({ product, onClose }: Props) {
       <div className="animate-fade-up grid max-h-[94dvh] overflow-y-auto bg-creme-claro sm:max-h-[90dvh] md:grid-cols-[1.05fr_1fr]">
         {/* Foto */}
         <div className="relative aspect-[4/3] bg-palha md:aspect-auto md:min-h-full">
-          <Image
+          <ProductPhoto
             src={product.image}
-            alt={product.imageAlt}
-            fill
+            alt={product.imageAlt || product.name}
             sizes="(min-width: 768px) 450px, 100vw"
-            className="object-cover"
             priority
           />
           <span
@@ -209,7 +206,7 @@ export default function ProductModal({ product, onClose }: Props) {
                 })
               }
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-whats px-6 py-4 text-base font-bold text-white shadow-md shadow-whats/30 transition-all hover:-translate-y-0.5 hover:bg-whats-escuro"
             >
               <MessageCircle className="size-5" />

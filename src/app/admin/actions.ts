@@ -63,8 +63,8 @@ function parseProduct(formData: FormData) {
   const name = get("name");
   if (name.length < 2) return { error: "Dê um nome para o produto." } as const;
 
-  const imageUrl = get("image_url");
-  if (!imageUrl) return { error: "Envie uma foto do produto." } as const;
+  // Foto opcional: sem foto o site mostra "foto em breve" até a Suh enviar uma.
+  const imageUrl = get("image_url") || null;
 
   const rawPrice = get("price_from");
   // Aceita "189.90" (input numérico) e "1.189,90" (digitado no padrão brasileiro).

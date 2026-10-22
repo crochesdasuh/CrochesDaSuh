@@ -10,7 +10,7 @@ export type ProductRow = {
   name: string;
   short_description: string;
   description: string;
-  image_url: string;
+  image_url: string | null;
   image_alt: string;
   categories: string[];
   price_from: number | string;
@@ -34,7 +34,7 @@ export function rowToProduct(row: ProductRow): AdminProduct {
     name: row.name,
     shortDescription: row.short_description,
     description: row.description,
-    image: row.image_url,
+    image: row.image_url || null,
     imageAlt: row.image_alt || row.name,
     categories: row.categories as Exclude<CategoryId, "todos">[],
     priceFrom: Number(row.price_from),

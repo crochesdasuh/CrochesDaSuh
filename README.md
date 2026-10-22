@@ -13,8 +13,10 @@ npm run build
 
 - **Produtos:** pelo painel `/admin` (com o Supabase configurado). Sem Supabase, o site usa
   o catálogo estático de `src/data/crochets.ts`, que também serve de reserva.
-- **WhatsApp, Instagram, paletas de cores, depoimentos e cuidados:** `src/data/crochets.ts`
-  - `WHATSAPP_NUMBER` precisa ser o número real (DDI + DDD + número, só dígitos).
+- **Instagram, paletas de cores, depoimentos e cuidados:** `src/data/crochets.ts`
+- **WhatsApp:** variável de ambiente `WHATSAPP_NUMBER` (DDI + DDD + número, só dígitos), no
+  `.env` e no Netlify. Ela fica só no servidor: os botões apontam para `/whatsapp`, que monta
+  a mensagem e redireciona; o número não aparece no código, no GitHub nem no HTML.
 - **Página:** `src/app/page.tsx` · **Catálogo/filtros:** `src/components/Catalog.tsx` ·
   **Modal de pedido:** `src/components/ProductModal.tsx`
 
@@ -43,8 +45,9 @@ Arquivos principais: `src/app/admin/`, `src/components/admin/`, `src/lib/admin.t
 ## Configurar o Supabase
 
 1. Crie um projeto em [supabase.com](https://supabase.com) (região **São Paulo**).
-2. Em **SQL Editor**, rode `supabase/migrations/0001_init.sql`, depois `supabase/seed.sql`
-   (o seed cadastra as 7 peças iniciais), `supabase/migrations/0002_calculadora.sql` e `supabase/migrations/0003_receitas.sql`.
+2. Em **SQL Editor**, rode na ordem `supabase/migrations/0001_init.sql`, `0002_calculadora.sql`,
+   `0003_receitas.sql`, `0004_fotos_opcionais.sql` e por fim `supabase/seed.sql`
+   (o seed cadastra as 7 peças iniciais, sem foto).
 3. Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**.
 4. Em **Authentication → Users → Add user**, crie o usuário da Suh (e-mail + senha,
    marcando “Auto Confirm User”).
@@ -81,24 +84,12 @@ Arquivos principais: `src/app/admin/`, `src/components/admin/`, `src/lib/admin.t
 1. Suba o projeto para um repositório no GitHub.
 2. No Netlify: **Add new site → Import an existing project** → escolha o repositório.
    O `netlify.toml` já define build e versão do Node.
-3. Em **Site configuration → Environment variables**, adicione
-   `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
+3. Em **Project configuration → Environment variables**, adicione
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` e `WHATSAPP_NUMBER`.
 4. Faça o deploy e teste `/admin`.
 
-## Fotos provisórias (Wikimedia Commons)
+## Fotos
 
-`suh.jpg` é a foto real da artesã. As demais abaixo são provisórias.
-
-As imagens em `public/images/` são placeholders de licença livre e exigem atribuição
-enquanto estiverem no site. Substitua-as pelas fotos reais antes de publicar.
-
-| Arquivo | Origem | Licença |
-| --- | --- | --- |
-| bolsa.jpg | [Blue-green meshwork bag](https://commons.wikimedia.org/wiki/File:Blue-green_meshwork_bag_(1091182610).jpg) — Breibeest | CC BY 2.0 |
-| cesto.jpg | [Granny square basket.jpg](https://commons.wikimedia.org/wiki/File:Granny_square_basket.jpg) — Valki77 | CC BY-SA 4.0 |
-| centro-mesa.jpg | [Crochet doily.JPG](https://commons.wikimedia.org/wiki/File:Crochet_doily.JPG) — רחל1 | CC BY-SA 4.0 |
-| tapete.jpg | [RagRug.jpg](https://commons.wikimedia.org/wiki/File:RagRug.jpg) | ver página |
-| amigurumi.jpg | [Amigurumi-bear.jpg](https://commons.wikimedia.org/wiki/File:Amigurumi-bear.jpg) | ver página |
-| maos.jpg | [Leftie crochet.jpg](https://commons.wikimedia.org/wiki/File:Leftie_crochet.jpg) | ver página |
-| jogo-americano.jpg | [Crocheted Table Runner and Placemat Set (DPLA)](https://commons.wikimedia.org/wiki/File:Crocheted_Table_Runner_and_Placemat_Set_Given_to_Anne_Morrow_Lindbergh_-_DPLA_-_00d0cb0ca576e24a1d3779829107a79a_(page_1).jpg) | ver página |
-| porta-copos.jpg | [Podkładka pod kubek. Tunisian crochet](https://commons.wikimedia.org/wiki/File:Podk%C5%82adka_pod_kubek._Tunisian_crochet.jpg) | ver página |
+As fotos das peças são enviadas pelo painel (`/admin/produtos`) e ficam no Supabase. Peça sem
+foto aparece no site com um quadro “foto em breve”. A capa mostra as 3 primeiras peças que já
+têm foto. `public/images/suh.jpg` é a foto da artesã (seção “Sobre”).

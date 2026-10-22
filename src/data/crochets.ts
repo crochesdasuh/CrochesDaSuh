@@ -1,8 +1,8 @@
 // Dados estáticos do catálogo Crochês da Suh.
-// Fotos, preços, depoimentos e número de WhatsApp são EXEMPLOS:
-// substitua pelos dados reais da Suh antes de publicar.
+// Preços e depoimentos são EXEMPLOS (as fotos entram pelo /admin; o WhatsApp vem da
+// variável de ambiente WHATSAPP_NUMBER, lida só no servidor em src/lib/whatsapp.ts):
+// Substitua pelos dados reais da Suh antes de publicar.
 
-export const WHATSAPP_NUMBER = "5511999999999"; // DDI + DDD + número, só dígitos
 export const INSTAGRAM_HANDLE = "croches_dasuh";
 export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
 
@@ -54,7 +54,8 @@ export type Product = {
   name: string;
   shortDescription: string;
   description: string;
-  image: string;
+  /** Foto real da peça; null = ainda sem foto (o site mostra "foto em breve"). */
+  image: string | null;
   imageAlt: string;
   categories: Exclude<CategoryId, "todos">[];
   priceFrom: number;
@@ -76,8 +77,8 @@ export const products: Product[] = [
     shortDescription: "Kit Mesa Posta em fio de malha com acabamento trabalhado.",
     description:
       "Jogo em fio de malha/barbante com acabamento trabalhado. Deixa a mesa do café ao jantar com cara de casa de vó — só que moderna. Cada lugar acompanha jogo americano e sousplat combinando.",
-    image: "/images/jogo-americano.jpg",
-    imageAlt: "Jogos americanos de crochê em tom cru dispostos lado a lado",
+    image: null,
+    imageAlt: "",
     categories: ["mesa"],
     priceFrom: 189,
     leadTime: { type: "encomenda", days: 5 },
@@ -91,8 +92,8 @@ export const products: Product[] = [
     shortDescription: "Jogo de banheiro 3 peças em algodão macio.",
     description:
       "Jogo de banheiro 3 peças em algodão macio: tapete oval, tampa de vaso e contorno. Fofinho para pisar, firme para não escorregar e lindo em qualquer cantinho.",
-    image: "/images/tapete.jpg",
-    imageAlt: "Tapete redondo de crochê em tons terrosos e azuis sobre o piso",
+    image: null,
+    imageAlt: "",
     categories: ["banheiro"],
     priceFrom: 159,
     leadTime: { type: "encomenda", days: 7 },
@@ -106,8 +107,8 @@ export const products: Product[] = [
     shortDescription: "Bolsa moderna em crochê estruturado com alça resistente.",
     description:
       "Bolsa moderna feita em crochê estruturado com alça resistente. Leve para a feira, a praia ou o passeio de domingo — cabe tudo e ainda arranca elogios.",
-    image: "/images/bolsa.jpg",
-    imageAlt: "Bolsa de crochê em trama aberta pendurada em um gancho",
+    image: null,
+    imageAlt: "",
     categories: ["bolsas", "pronta-entrega"],
     priceFrom: 129,
     leadTime: { type: "pronta" },
@@ -121,8 +122,8 @@ export const products: Product[] = [
     shortDescription: "Cesto em fio de malha para quarto de bebê ou sala.",
     description:
       "Cesto em fio de malha para quarto de bebê ou organização de sala. Guarda fraldas, brinquedos, mantas e revistas com charme e aconchego.",
-    image: "/images/cesto.jpg",
-    imageAlt: "Cesto de crochê com quadradinhos coloridos e um ursinho de crochê dentro",
+    image: null,
+    imageAlt: "",
     categories: ["infantil", "pronta-entrega"],
     priceFrom: 89,
     leadTime: { type: "pronta" },
@@ -136,8 +137,8 @@ export const products: Product[] = [
     shortDescription: "Peça elegante em pontilhado delicado para mesa de jantar.",
     description:
       "Peça elegante em pontilhado delicado para mesa de jantar. Um clássico que atravessa gerações e deixa a casa pronta para receber.",
-    image: "/images/centro-mesa.jpg",
-    imageAlt: "Centro de mesa redondo de crochê rendado em linha cru",
+    image: null,
+    imageAlt: "",
     categories: ["mesa"],
     priceFrom: 119,
     leadTime: { type: "encomenda", days: 6 },
@@ -151,8 +152,8 @@ export const products: Product[] = [
     shortDescription: "Bichinho de crochê fofinho, perfeito para presentear.",
     description:
       "Ursinho amigurumi com enchimento antialérgico e olhinhos com trava de segurança. Companheiro de soneca e lembrança para a vida toda.",
-    image: "/images/amigurumi.jpg",
-    imageAlt: "Ursinho de crochê vermelho com flor na cabeça e blusinha listrada",
+    image: null,
+    imageAlt: "",
     categories: ["infantil"],
     priceFrom: 99,
     leadTime: { type: "encomenda", days: 10 },
@@ -166,8 +167,8 @@ export const products: Product[] = [
     shortDescription: "Porta-copos em crochê tunisiano, prontinho para enviar.",
     description:
       "Porta-copos em crochê tunisiano com listras alegres. Protege a mesa e dá aquele toque artesanal no cafezinho da tarde.",
-    image: "/images/porta-copos.jpg",
-    imageAlt: "Porta-copos de crochê amarelo-claro com listras vermelhas",
+    image: null,
+    imageAlt: "",
     categories: ["mesa", "pronta-entrega"],
     priceFrom: 49,
     leadTime: { type: "pronta" },
@@ -185,10 +186,6 @@ export function formatLeadTime(leadTime: LeadTime) {
 
 export function formatPrice(value: number) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-export function whatsappLink(message: string) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 export function buildOrderMessage(product: Product, palette: ColorPalette, quantity: number) {

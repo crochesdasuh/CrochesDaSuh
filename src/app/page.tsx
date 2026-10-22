@@ -19,19 +19,18 @@ import {
 } from "lucide-react";
 import Catalog from "@/components/Catalog";
 import PageViewTracker from "@/components/PageViewTracker";
+import ProductPhoto from "@/components/ProductPhoto";
 import { InstagramIcon, Logo } from "@/components/icons";
 import {
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
   careTips,
   testimonials,
-  whatsappLink,
 } from "@/data/crochets";
 import { getCatalogProducts } from "@/lib/products";
 
-const greetingUrl = whatsappLink(
-  "Olá Dona Suh! Vim pelo site e queria conversar sobre uma peça de crochê. 🧶",
-);
+// O número do WhatsApp fica só no servidor (rota /whatsapp).
+const greetingUrl = "/whatsapp";
 
 const navLinks = [
   { href: "#catalogo", label: "Catálogo" },
@@ -51,6 +50,9 @@ const careIcons = { hand: Hand, droplets: Droplets, sun: Sun, wind: Wind } as co
 
 export default async function Home() {
   const products = await getCatalogProducts();
+  // A capa mostra as 3 primeiras peças que já têm foto (fotos reais do ateliê).
+  const withPhoto = products.filter((p) => p.image);
+  const heroSlots = [0, 1, 2].map((i) => withPhoto[i] ?? null);
 
   return (
     <>
@@ -82,7 +84,7 @@ export default async function Home() {
           <a
             href={greetingUrl}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             className="inline-flex items-center gap-2 rounded-full bg-whats px-3.5 py-2.5 text-sm font-bold text-white shadow-sm transition-colors hover:bg-whats-escuro sm:px-5"
           >
             <MessageCircle className="size-4" />
@@ -122,7 +124,7 @@ export default async function Home() {
                 <a
                   href={greetingUrl}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener noreferrer nofollow"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-amber-200 bg-white px-7 py-4 font-bold text-grafite shadow-sm transition-colors hover:border-whats hover:text-whats-escuro"
                 >
                   <MessageCircle className="size-4 text-whats" />
@@ -138,34 +140,21 @@ export default async function Home() {
             {/* Colagem de fotos */}
             <div className="relative mx-auto w-full max-w-md md:max-w-none">
               <div className="grid grid-cols-5 grid-rows-6 gap-3 sm:gap-4">
-                <div className="relative col-span-3 row-span-6 aspect-[3/4.4] overflow-hidden rounded-3xl border-4 border-white shadow-md">
-                  <Image
-                    src="/images/maos.jpg"
-                    alt="Mãos crochetando uma manta de quadradinhos coloridos"
-                    fill
-                    priority
-                    sizes="(min-width: 768px) 320px, 60vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative col-span-2 row-span-3 overflow-hidden rounded-3xl border-4 border-white shadow-md">
-                  <Image
-                    src="/images/centro-mesa.jpg"
-                    alt="Centro de mesa de crochê rendado"
-                    fill
-                    sizes="(min-width: 768px) 220px, 40vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="relative col-span-2 row-span-3 overflow-hidden rounded-3xl border-4 border-white shadow-md">
-                  <Image
-                    src="/images/cesto.jpg"
-                    alt="Cesto de crochê colorido"
-                    fill
-                    sizes="(min-width: 768px) 220px, 40vw"
-                    className="object-cover"
-                  />
-                </div>
+                {heroSlots.map((slot, i) => (
+                  <div
+                    key={i}
+                    className={`relative overflow-hidden rounded-3xl border-4 border-white shadow-md ${
+                      i === 0 ? "col-span-3 row-span-6 aspect-[3/4.4]" : "col-span-2 row-span-3"
+                    }`}
+                  >
+                    <ProductPhoto
+                      src={slot?.image ?? null}
+                      alt={slot ? slot.imageAlt || slot.name : "Peça de crochê do Ateliê da Suh"}
+                      sizes={i === 0 ? "(min-width: 768px) 320px, 60vw" : "(min-width: 768px) 220px, 40vw"}
+                      priority={i === 0}
+                    />
+                  </div>
+                ))}
               </div>
               <div className="animate-float absolute -bottom-5 -left-2 flex items-center gap-3 rounded-2xl border border-amber-100 bg-white px-4 py-3 shadow-md sm:-left-6">
                 <span className="grid size-10 place-items-center rounded-full bg-rosa-claro">
@@ -351,7 +340,7 @@ export default async function Home() {
               <a
                 href={greetingUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="mt-7 inline-flex items-center gap-2 rounded-2xl bg-white px-7 py-4 font-bold text-terracota-escuro shadow-md transition-transform hover:-translate-y-0.5"
               >
                 <MessageCircle className="size-5 text-whats" />
@@ -390,7 +379,7 @@ export default async function Home() {
               <a
                 href={INSTAGRAM_URL}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="group inline-flex items-center gap-3 text-sm text-cafe hover:text-terracota"
               >
                 <span className="grid size-10 place-items-center rounded-full bg-gradient-to-tr from-amber-400 via-rosa to-terracota text-white">
@@ -404,7 +393,7 @@ export default async function Home() {
               <a
                 href={greetingUrl}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="group inline-flex items-center gap-3 text-sm text-cafe hover:text-whats-escuro"
               >
                 <span className="grid size-10 place-items-center rounded-full bg-whats text-white">
@@ -432,7 +421,7 @@ export default async function Home() {
       <a
         href={greetingUrl}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="noopener noreferrer nofollow"
         aria-label="Conversar no WhatsApp"
         className="fixed bottom-5 right-5 z-30 grid size-14 place-items-center rounded-full bg-whats text-white shadow-lg shadow-whats/40 transition-transform hover:scale-105 md:hidden"
       >
